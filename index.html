@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shabach 4.0 – I Will Be There</title>
+<meta name="description" content="Show them you will be there! Get your Shabach 4.0 flyer.">
+<meta property="og:title" content="Get your Shabach 4.0 flyer">
+<meta property="og:description" content="Show them you will be there! · 05.12.2026, 5PM">
+<meta property="og:image" content="https://shabach4.vercel.app/assets/preview.jpg">
+<meta property="og:url" content="https://shabach4.vercel.app/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#120700">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,800;1,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0500;
+    --panel: #1c0d02;
+    --orange: #f28c00;
+    --orange-2: #e86c09;
+    --gold: #f7c25a;
+    --text: #fff6ea;
+    --muted: #c9a982;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #3a1a02 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--text);
+    font-family: Poppins, system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 48px;
+  }
+  header { text-align: center; max-width: 560px; }
+  h1 {
+    margin: 0 0 6px; font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 800; font-style: italic;
+    background: linear-gradient(180deg, #ffe7a3, var(--gold) 45%, #c47a12);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 0; color: var(--muted); font-size: .95rem; }
+
+  main { width: 100%; max-width: 520px; margin-top: 20px; }
+
+  .stage {
+    position: relative; width: 100%;
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(242,140,0,.18), 0 0 0 1px rgba(242,140,0,.25);
+    background: #000;
+    user-select: none;
+    container-type: inline-size;
+  }
+  canvas { display: block; width: 100%; height: auto; }
+  .stage.has-photo { cursor: grab; touch-action: none; }
+  .stage.dragging { cursor: grabbing; }
+
+  .drop-hint {
+    position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; text-align: center; padding: 16px;
+    color: var(--orange-2); font-weight: 800; font-style: italic; font-size: clamp(1rem, 4.5vw, 1.5rem);
+    background: #fff; border: 0; cursor: pointer; font-family: inherit;
+  }
+  .drop-hint svg { width: 44px; height: 44px; }
+  .drop-hint small { font-style: normal; font-weight: 400; font-size: .8rem; color: #8a5a2a; }
+  .stage.drag-over .drop-hint { background: #fff3e2; }
+  .stage.has-photo .drop-hint { display: none; }
+
+  .controls { margin-top: 16px; display: grid; gap: 12px; }
+  .zoom { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: .85rem; }
+  .has-photo-ui .zoom { display: flex; }
+  .zoom input { flex: 1; accent-color: var(--orange); }
+  .tip { display: none; text-align: center; color: var(--muted); font-size: .8rem; margin: 0; }
+  .has-photo-ui .tip { display: block; }
+
+  .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button.btn, label.btn {
+    appearance: none; border: 0; border-radius: 12px; padding: 14px 12px;
+    font: 600 1rem Poppins, system-ui, sans-serif; cursor: pointer; text-align: center;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .08s, filter .15s, opacity .15s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: linear-gradient(180deg, var(--orange), var(--orange-2)); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px rgba(242,140,0,.6); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .full { grid-column: 1 / -1; }
+  #share { display: none; }
+  .can-share #share { display: inline-flex; }
+
+  footer { margin-top: 28px; color: #7b5d3c; font-size: .75rem; text-align: center; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<header>
+  <h1>I Will Be There!!!</h1>
+  <p>Show them you will be there!</p>
+</header>
+
+<main id="app">
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="Flyer preview"></canvas>
+    <button class="drop-hint" id="dropHint" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      TAP TO ADD<br>YOUR PHOTO
+      <small>or drag &amp; drop an image here</small>
+    </button>
+  </div>
+
+  <div class="controls">
+    <div class="zoom">
+      <span>Zoom</span>
+      <input type="range" id="zoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom photo">
+    </div>
+    <p class="tip">Drag the photo to reposition it. Pinch or use the slider to zoom.</p>
+
+    <div class="btns">
+      <label class="btn btn-ghost" for="file" id="pickLabel">Choose photo</label>
+      <button class="btn btn-primary" id="download" type="button" disabled>Download PNG</button>
+      <button class="btn btn-primary full" id="share" type="button" disabled>Share to WhatsApp / Instagram</button>
+    </div>
+    <input class="visually-hidden" type="file" id="file" accept="image/*">
+  </div>
+</main>
+
+<footer>Sunesis Sound presents Shabach 4.0 · 05.12.2026 · 5PM<br>Your photo never leaves your device.</footer>
+
+<script>
+(() => {
+  // Template geometry (in template pixels). Regenerate with scripts/make_template.py.
+  const T = { width: 723, height: 803, hole: { x: 121, y: 256, w: 482, h: 488, r: 22 } };
+  const OUT_W = 1080;                       // export width (Instagram-friendly)
+  const SCALE = OUT_W / T.width;
+  const OUT_H = Math.round(T.height * SCALE);
+  const H = { x: T.hole.x * SCALE, y: T.hole.y * SCALE, w: T.hole.w * SCALE, h: T.hole.h * SCALE, r: T.hole.r * SCALE };
+
+  const $ = (id) => document.getElementById(id);
+  const app = $('app'), stage = $('stage'), canvas = $('canvas'), ctx = canvas.getContext('2d');
+  const fileInput = $('file'), zoomInput = $('zoom'), dlBtn = $('download'), shareBtn = $('share'), dropHint = $('dropHint');
+  canvas.width = OUT_W; canvas.height = OUT_H;
+
+  // Position the "add photo" button over the hole.
+  Object.assign(dropHint.style, {
+    left: (T.hole.x / T.width * 100) + '%', top: (T.hole.y / T.height * 100) + '%',
+    width: (T.hole.w / T.width * 100) + '%', height: (T.hole.h / T.height * 100) + '%',
+    borderRadius: `${T.hole.r / T.width * 100}cqw ${T.hole.r / T.width * 100}cqw 0 0`,
+  });
+
+  const template = new Image();
+  template.src = 'assets/template.png';
+  template.onload = draw;
+
+  let photo = null;
+  let zoom = 1, offX = 0, offY = 0;   // offset of photo center from hole center, in canvas px
+
+  function baseScale() { return Math.max(H.w / photo.width, H.h / photo.height); }
+
+  function clamp() {
+    const s = baseScale() * zoom;
+    const maxX = Math.max(0, (photo.width * s - H.w) / 2);
+    const maxY = Math.max(0, (photo.height * s - H.h) / 2);
+    offX = Math.min(maxX, Math.max(-maxX, offX));
+    offY = Math.min(maxY, Math.max(-maxY, offY));
+  }
+
+  function holePath() {
+    const { x, y, w, h, r } = H;
+    ctx.beginPath();
+    ctx.moveTo(x, y + h);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h);
+    ctx.closePath();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, OUT_W, OUT_H);
+    ctx.save();
+    holePath();
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    if (photo) {
+      ctx.clip();
+      clamp();
+      const s = baseScale() * zoom;
+      const w = photo.width * s, h = photo.height * s;
+      const cx = H.x + H.w / 2 + offX, cy = H.y + H.h / 2 + offY;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(photo, cx - w / 2, cy - h / 2, w, h);
+    }
+    ctx.restore();
+    if (template.complete && template.naturalWidth) {
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(template, 0, 0, OUT_W, OUT_H);
+    }
+  }
+
+  async function loadFile(file) {
+    if (!file || !file.type.startsWith('image/')) { alert('Please choose an image file.'); return; }
+    const url = URL.createObjectURL(file);
+    try {
+      let img;
+      if ('createImageBitmap' in window) {
+        try { img = await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch { img = null; }
+      }
+      if (!img) {
+        img = new Image();
+        img.src = url;
+        await img.decode();
+      }
+      photo = img;
+      zoom = 1; offX = 0; offY = 0; zoomInput.value = 1;
+      stage.classList.add('has-photo'); app.classList.add('has-photo-ui');
+      dlBtn.disabled = false; shareBtn.disabled = false;
+      $('pickLabel').textContent = 'Change photo';
+      draw();
+    } catch (e) {
+      alert("Sorry, that image couldn't be opened. Try a JPG or PNG.");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  fileInput.addEventListener('change', () => { loadFile(fileInput.files[0]); fileInput.value = ''; });
+  dropHint.addEventListener('click', () => fileInput.click());
+
+  // Drag & drop
+  ['dragenter', 'dragover'].forEach(ev => stage.addEventListener(ev, e => { e.preventDefault(); stage.classList.add('drag-over'); }));
+  ['dragleave', 'drop'].forEach(ev => stage.addEventListener(ev, e => { e.preventDefault(); stage.classList.remove('drag-over'); }));
+  stage.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+
+  // Pan + pinch with pointer events
+  const pointers = new Map();
+  let pinchStart = null;
+  const toCanvas = () => OUT_W / canvas.getBoundingClientRect().width;
+
+  stage.addEventListener('pointerdown', e => {
+    if (!photo) return;
+    stage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    stage.classList.add('dragging');
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinchStart = { dist: Math.hypot(a.x - b.x, a.y - b.y), zoom };
+    }
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!photo || !pointers.has(e.pointerId)) return;
+    const prev = pointers.get(e.pointerId);
+    const cur = { x: e.clientX, y: e.clientY };
+    pointers.set(e.pointerId, cur);
+    if (pointers.size === 2 && pinchStart) {
+      const [a, b] = [...pointers.values()];
+      setZoom(pinchStart.zoom * Math.hypot(a.x - b.x, a.y - b.y) / pinchStart.dist);
+    } else if (pointers.size === 1) {
+      const k = toCanvas();
+      offX += (cur.x - prev.x) * k; offY += (cur.y - prev.y) * k;
+      draw();
+    }
+  });
+  const endPointer = e => {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+    if (!pointers.size) stage.classList.remove('dragging');
+  };
+  stage.addEventListener('pointerup', endPointer);
+  stage.addEventListener('pointercancel', endPointer);
+
+  stage.addEventListener('wheel', e => {
+    if (!photo) return;
+    e.preventDefault();
+    setZoom(zoom * Math.exp(-e.deltaY * 0.0015));
+  }, { passive: false });
+
+  function setZoom(z) {
+    const nz = Math.min(4, Math.max(1, z));
+    offX *= nz / zoom; offY *= nz / zoom;   // zoom around hole center
+    zoom = nz; zoomInput.value = nz;
+    draw();
+  }
+  zoomInput.addEventListener('input', () => setZoom(parseFloat(zoomInput.value)));
+
+  // Export
+  const FILENAME = 'shabach-4.0-i-will-be-there.png';
+  const toBlob = () => new Promise(res => canvas.toBlob(res, 'image/png'));
+
+  dlBtn.addEventListener('click', async () => {
+    const blob = await toBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = FILENAME;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+
+  // Native share sheet (mobile) → WhatsApp, Instagram, etc.
+  const probe = new File([new Blob()], 'x.png', { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [probe] })) document.documentElement.classList.add('can-share');
+  shareBtn.addEventListener('click', async () => {
+    const file = new File([await toBlob()], FILENAME, { type: 'image/png' });
+    try {
+      await navigator.share({ files: [file], text: "I will be there!!! Shabach 4.0 · 05.12.2026 · 5PM" });
+    } catch (e) {
+      if (e.name !== 'AbortError') dlBtn.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>
