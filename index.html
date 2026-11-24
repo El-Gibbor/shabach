@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shabach 4.0 – I Will Be There</title>
-<meta name="description" content="Show them you will be there! Get your Shabach 4.0 flyer.">
+<meta name="description" content="Add your photo, get your Shabach 4.0 flyer, and share it.">
 <meta property="og:title" content="Get your Shabach 4.0 flyer">
-<meta property="og:description" content="Show them you will be there! · 05.12.2026, 5PM">
+<meta property="og:description" content="Add your photo. Download. Share. · 05-12-2026, 5PM">
 <meta property="og:image" content="https://shabach4.vercel.app/assets/preview.jpg">
 <meta property="og:url" content="https://shabach4.vercel.app/">
 <meta property="og:type" content="website">
@@ -97,7 +97,7 @@
 <body>
 <header>
   <h1>I Will Be There!!!</h1>
-  <p>Show them you will be there!</p>
+  <p>Add your photo. Download. Share.</p>
 </header>
 
 <main id="app">
@@ -126,7 +126,7 @@
   </div>
 </main>
 
-<footer>Sunesis Sound presents Shabach 4.0 · 05.12.2026 · 5PM<br>Your photo never leaves your device.</footer>
+<footer>Sunesis Sound presents Shabach 4.0 · 05-12-2026 · 5PM<br>Your photo never leaves your device.</footer>
 
 <script>
 (() => {
@@ -304,7 +304,7 @@
   shareBtn.addEventListener('click', async () => {
     const file = new File([await toBlob()], FILENAME, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], text: "I will be there!!! Shabach 4.0 · 05.12.2026 · 5PM" });
+      await navigator.share({ files: [file], text: "I will be there!!! Shabach 4.0 · 05-12-2026 · 5PM" });
     } catch (e) {
       if (e.name !== 'AbortError') dlBtn.click();
     }
